@@ -25,7 +25,10 @@ export default async (item: FeedEntry) => {
   // Bluesky用のテキストを作成
   const bskyText = await (async () => {
     const max = 300;
-    const key = 'LINK';
+    const { host, pathname } = new URL(link);
+    const key =
+      splitter.splitGraphemes(`${host}${pathname}`).slice(0, 19).join('') +
+      '...';
     let text = `${title}\n\n${key}`;
 
     if (splitter.countGraphemes(text) > max) {
@@ -41,7 +44,6 @@ export default async (item: FeedEntry) => {
     const rt = new RichText({ text });
     await rt.detectFacets(agent);
     rt.facets = [
-      ...(rt.facets || []),
       {
         index: {
           byteStart:
@@ -55,6 +57,7 @@ export default async (item: FeedEntry) => {
           },
         ],
       },
+      ...(rt.facets || []),
     ];
     return rt;
   })();
