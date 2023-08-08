@@ -29,25 +29,17 @@ export default async (item: FeedEntry) => {
     const key =
       splitter.splitGraphemes(`${host}${pathname}`).slice(0, 19).join('') +
       '...';
-    let text = `${title}\n\n${key}`;
-
-    if (splitter.countGraphemes(text) > max) {
-      const ellipsis = `...\n\n`;
-      const cnt = max - splitter.countGraphemes(`${ellipsis}${key}`);
-      const shortenedTitle = splitter
-        .splitGraphemes(title)
-        .slice(0, cnt)
-        .join('');
-      text = `${shortenedTitle}${ellipsis}${key}`;
-    }
+    const text =
+      splitter.countGraphemes(`${description}\n\n${title}\n${key}`) <= max
+        ? `${description}\n\n${title}\n${key}`
+        : `${description}\n\n${key}`;
 
     const rt = new RichText({ text });
     await rt.detectFacets(agent);
     rt.facets = [
       {
         index: {
-          byteStart:
-            rt.unicodeText.length - new TextEncoder().encode(key).length,
+          byteStart: rt.unicodeText.length - splitter.countGraphemes(key),
           byteEnd: rt.unicodeText.length,
         },
         features: [
@@ -62,11 +54,18 @@ export default async (item: FeedEntry) => {
     return rt;
   })();
 
+  // X用のテキストを作成
+  const xText = (() => {
+    const max = 118;
+    return splitter.countGraphemes(`${description}\n\n${title}`) <= max
+      ? `${description}\n\n${title}\n${link}`
+      : `${description}\n\n${link}`;
+  })();
+
   return {
     bskyText,
-    xText: `${description}\n\n${link}`,
+    xText,
     title,
     link,
-    description,
   };
 };
