@@ -16,7 +16,7 @@ export default async (item: FeedEntry) => {
     if (!item.description?.value) return '';
     const doc = new DOMParser().parseFromString(
       item.description?.value,
-      'text/html'
+      'text/html',
     );
     return doc?.documentElement?.textContent || '';
   })();

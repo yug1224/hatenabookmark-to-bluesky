@@ -29,13 +29,7 @@ for await (const item of itemList) {
   const og = await getOgp(item.links[0].href || '');
 
   // 投稿記事のプロパティを作成
-  const { bskyText, xText, title, link } = await createProperties({
-    ...item,
-    title: {
-      type: item.title?.type,
-      value: og.ogTitle || item.title?.value || '',
-    },
-  });
+  const { bskyText, xText, title, link } = await createProperties(item);
 
   // 画像のリサイズ
   const { mimeType, resizedImage } = await (async () => {
