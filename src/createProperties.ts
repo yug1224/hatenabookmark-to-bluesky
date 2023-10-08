@@ -22,15 +22,13 @@ export default async (agent: BskyAgent, item: FeedEntry) => {
 
   // Bluesky用のテキストを作成
   const bskyText = await (async () => {
-    const max = 300;
     const { host, pathname } = new URL(link);
-    const key =
-      splitter.splitGraphemes(`${host}${pathname}`).slice(0, 19).join('') +
-      '...';
-    const text =
-      splitter.countGraphemes(`${description}\n\n${title}\n${key}`) <= max
-        ? `${description}\n\n${title}\n${key}`
-        : `${description}\n\n${key}`;
+    const key = splitter.splitGraphemes(`${host}${pathname}`).slice(0, 19).join('') + '...';
+    const text = `${description}\n\n${key}`;
+    // const max = 300;
+    // const text = splitter.countGraphemes(`${description}\n\n${title}\n${key}`) <= max
+    //   ? `${description}\n\n${title}\n${key}`
+    //   : `${description}\n\n${key}`;
 
     const rt = new RichText({ text });
     await rt.detectFacets(agent);
@@ -54,10 +52,12 @@ export default async (agent: BskyAgent, item: FeedEntry) => {
 
   // X用のテキストを作成
   const xText = (() => {
-    const max = 118;
-    return splitter.countGraphemes(`${description}\n\n${title}`) <= max
-      ? `${description}\n\n${title}\n${link}`
-      : `${description}\n\n${link}`;
+    // const max = 118;
+    // return splitter.countGraphemes(`${title}\n\n${description}`) <= max
+    //   ? `${title}\n${link}\n\n${description}`
+    //   : `${link}\n\n${description}`;
+
+    return `${title}\n${link}\n\n${description}`;
   })();
 
   return {
