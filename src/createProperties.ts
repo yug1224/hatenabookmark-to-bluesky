@@ -23,7 +23,7 @@ export default async (agent: BskyAgent, item: FeedEntry) => {
   // Bluesky用のテキストを作成
   const bskyText = await (async () => {
     const { host, pathname } = new URL(link);
-    const key = splitter.splitGraphemes(`${host}${pathname}`).slice(0, 19).join('') + '...';
+    const key = splitter.splitGraphemes(`${host}${pathname}`).slice(0, 19).join('') + '...\n---';
     const text = `${description}\n\n${key}`;
     // const max = 300;
     // const text = splitter.countGraphemes(`${description}\n\n${title}\n${key}`) <= max
@@ -36,7 +36,7 @@ export default async (agent: BskyAgent, item: FeedEntry) => {
       {
         index: {
           byteStart: rt.unicodeText.length - splitter.countGraphemes(key),
-          byteEnd: rt.unicodeText.length,
+          byteEnd: rt.unicodeText.length - splitter.countGraphemes('\n---'),
         },
         features: [
           {
@@ -57,7 +57,7 @@ export default async (agent: BskyAgent, item: FeedEntry) => {
     //   ? `${title}\n${link}\n\n${description}`
     //   : `${link}\n\n${description}`;
 
-    return `${title}\n${link}\n\n${description}`;
+    return `${description}\n\n${title}\n${link}\n---`;
   })();
 
   return {

@@ -30,9 +30,7 @@ try {
   // 取得した記事リストをループ処理
   for await (const item of itemList) {
     // 最終実行時間を更新
-    const timestamp = item.published
-      ? new Date(item.published).toISOString()
-      : new Date().toISOString();
+    const timestamp = item.published ? new Date(item.published).toISOString() : new Date().toISOString();
     await Deno.writeTextFile('.timestamp', timestamp);
 
     // URLからOGPの取得
