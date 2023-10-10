@@ -9,14 +9,14 @@ import AtprotoAPI, { BskyAgent } from 'npm:@atproto/api';
 const { RichText } = AtprotoAPI;
 
 export default async (agent: BskyAgent, item: FeedEntry) => {
-  const title = item.title?.value || '';
+  const title = (item.title?.value || '').trim();
   const description = (() => {
     if (!item.description?.value) return '';
     const doc = new DOMParser().parseFromString(
       item.description?.value,
       'text/html',
     );
-    return doc?.documentElement?.textContent || '';
+    return (doc?.documentElement?.textContent || '').trim();
   })();
   const link = item.links[0].href || '';
 
