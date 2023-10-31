@@ -1,7 +1,8 @@
 import 'https://deno.land/std@0.193.0/dotenv/load.ts';
 import { delay } from 'https://deno.land/std@0.201.0/async/mod.ts';
 import AtprotoAPI from 'npm:@atproto/api';
-import createProperties from './src/createProperties.ts';
+import createBlueskyProps from './src/createBlueskyProps.ts';
+import createXProps from './src/createXProps.ts';
 import getItemList from './src/getItemList.ts';
 import getOgp from './src/getOgp.ts';
 import postBluesky from './src/postBluesky.ts';
@@ -37,10 +38,8 @@ try {
     const og = await getOgp(item.links[0].href || '');
 
     // 投稿記事のプロパティを作成
-    const { bskyText, xText, title, link } = await createProperties(
-      agent,
-      item,
-    );
+    const { bskyText, link } = await createBlueskyProps(agent, item);
+    const { xText } = await createXProps(item);
 
     // 画像のリサイズ
     const { mimeType, resizedImage } = await (async () => {
@@ -56,7 +55,7 @@ try {
     await postBluesky({
       agent,
       rt: bskyText,
-      title,
+      title: og.ogTitle || '',
       link,
       description: og.ogDescription || '',
       mimeType,

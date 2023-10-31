@@ -9,7 +9,6 @@ import AtprotoAPI, { BskyAgent } from 'npm:@atproto/api';
 const { RichText } = AtprotoAPI;
 
 export default async (agent: BskyAgent, item: FeedEntry) => {
-  const title = (item.title?.value || '').trim();
   const description = (() => {
     if (!item.description?.value) return '';
     const doc = new DOMParser().parseFromString(
@@ -23,20 +22,16 @@ export default async (agent: BskyAgent, item: FeedEntry) => {
   // Bluesky用のテキストを作成
   const bskyText = await (async () => {
     const { host, pathname } = new URL(link);
-    const key = splitter.splitGraphemes(`${host}${pathname}`).slice(0, 19).join('') + '...\n---';
-    const text = `${description}\n\n${key}`;
-    // const max = 300;
-    // const text = splitter.countGraphemes(`${description}\n\n${title}\n${key}`) <= max
-    //   ? `${description}\n\n${title}\n${key}`
-    //   : `${description}\n\n${key}`;
+    const key = splitter.splitGraphemes(`${host}${pathname}`).slice(0, 19).join('') + '...';
+    const text = `${key}\n${description}`;
 
     const rt = new RichText({ text });
     await rt.detectFacets(agent);
     rt.facets = [
       {
         index: {
-          byteStart: rt.unicodeText.length - splitter.countGraphemes(key),
-          byteEnd: rt.unicodeText.length - splitter.countGraphemes('\n---'),
+          byteStart: 0,
+          byteEnd: splitter.countGraphemes(key),
         },
         features: [
           {
@@ -50,20 +45,6 @@ export default async (agent: BskyAgent, item: FeedEntry) => {
     return rt;
   })();
 
-  // X用のテキストを作成
-  const xText = (() => {
-    // const max = 118;
-    // return splitter.countGraphemes(`${title}\n\n${description}`) <= max
-    //   ? `${title}\n${link}\n\n${description}`
-    //   : `${link}\n\n${description}`;
-
-    return `${description}\n\n${title}\n${link}\n---`;
-  })();
-
-  return {
-    bskyText,
-    xText,
-    title,
-    link,
-  };
+  console.log('success createBlueskyProps');
+  return { bskyText, link };
 };
